@@ -214,7 +214,7 @@ footer{text-align:center;padding:24px;color:var(--muted);font-size:12px;border-t
   <div class="game-controls">
     <button class="primary" id="start-btn">开始游戏</button>
     <button id="skip-btn" disabled>跳过</button>
-    <button id="mode-btn">中文→英文</button>
+    <button id="mode-btn">中-英</button>
   </div>
 
 </div>
@@ -529,7 +529,8 @@ function updateStats(){
 function toggleMode(){
   if(isPlaying) return;
   isCnMode = !isCnMode;
-  modeBtn.textContent = isCnMode ? '英译中' : '中译英';
+  modeBtn.textContent = isCnMode ? '中-英' : '英-中';
+  showWord();
 }
 
 function renderWordList(){
