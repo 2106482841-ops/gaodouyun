@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>高斗云 · 右脑图像记忆法背单词</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--primary:#2563eb;--primary-dark:#1d4ed8;--accent:#f59e0b;--bg:#0f172a;--card:#1e293b;--text:#e2e8f0;--muted:#94a3b8}
+body{font-family:-apple-system,PingFang SC,Helvetica Neue,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.container{width:100%;max-width:800px;margin:0 auto;padding:16px}
+
+/* ===== NAV ===== */
+nav{background:linear-gradient(135deg,#1e293b,#0f172a);padding:12px 0;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:100}
+nav .container{display:flex;align-items:center;gap:12px}
+nav .logo{display:flex;align-items:center}
+nav .logo img{height:36px;width:auto;object-fit:contain;filter:brightness(1.1)}
+nav .tag{font-size:11px;color:var(--muted);background:rgba(255,255,255,.06);padding:2px 8px;border-radius:10px}
+.nav-links{display:flex;gap:6px;margin-left:auto}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:13px;padding:6px 12px;border-radius:8px;transition:.2s}
+.nav-links a:hover,.nav-links a.active{color:#fff;background:rgba(255,255,255,.08)}
+
+/* ===== SECTIONS ===== */
+.section{display:none;padding:20px 0}
+.section.active{display:block}
+
+/* ===== BRAND HERO ===== */
+.hero{text-align:center;padding:40px 0 32px}
+.hero h1{font-size:36px;font-weight:900;background:linear-gradient(135deg,#60a5fa,#a78bfa,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:12px;line-height:1.2}
+.hero p{color:var(--muted);font-size:16px;max-width:600px;margin:0 auto 24px;line-height:1.7}
+.hero .subtitle{font-size:14px;color:#60a5fa;background:rgba(96,165,250,.1);display:inline-block;padding:4px 16px;border-radius:20px;margin-bottom:20px}
+
+/* ===== FEATURES ===== */
+.features{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:24px 0}
+.feature-card{background:var(--card);border-radius:12px;padding:16px;border:1px solid rgba(255,255,255,.06)}
+.feature-card .icon{display:none}
+.feature-card h3{font-size:15px;margin-bottom:4px;padding-left:10px;border-left:3px solid var(--accent)}
+.feature-card p{font-size:13px;color:var(--muted);line-height:1.5}
+
+/* ===== BRAND INFO ===== */
+.brand-section{margin:32px 0}
+.brand-section h2{font-size:20px;font-weight:700;margin-bottom:16px;padding-left:12px;border-left:3px solid var(--accent)}
+.brand-section p{color:var(--muted);font-size:14px;line-height:1.8;margin-bottom:12px}
+
+.steps{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0}
+.step{background:var(--card);border-radius:10px;padding:14px;flex:1;min-width:120px;border:1px solid rgba(255,255,255,.06);text-align:center}
+.step .num{font-size:20px;font-weight:700;color:var(--accent);display:block}
+.step .label{font-size:13px;color:var(--muted);margin-top:4px;display:block}
+
+/* ===== WORD GAME ===== */
+.game-header{text-align:center;margin-bottom:20px}
+.game-header h2{font-size:22px;font-weight:700;margin-bottom:6px}
+.game-header p{color:var(--muted);font-size:14px}
+
+.stats-bar{display:flex;gap:10px;margin:16px 0;flex-wrap:wrap}
+.stat{background:var(--card);border-radius:10px;padding:10px 14px;flex:1;min-width:80px;text-align:center;border:1px solid rgba(255,255,255,.06)}
+.stat .val{font-size:20px;font-weight:700;color:var(--accent)}
+.stat .lbl{font-size:11px;color:var(--muted);margin-top:2px}
+
+.word-display{background:var(--card);border-radius:16px;padding:40px 20px;text-align:center;margin:16px 0;border:1px solid rgba(255,255,255,.06);min-height:120px}
+.word-display .en{font-size:36px;font-weight:800;margin-bottom:8px;letter-spacing:1px}
+.word-display .hint{color:var(--muted);font-size:14px}
+.word-display .count{font-size:13px;color:var(--muted);margin-top:12px}
+
+.word-display .result{font-size:24px;font-weight:700;margin-top:12px}
+.word-display .result.correct{color:#22c55e}
+.word-display .result.wrong{color:#ef4444}
+.word-display .result .meaning{font-size:16px;color:var(--muted);font-weight:400;display:block;margin-top:4px}
+
+.input-area{display:flex;gap:10px;margin:12px 0}
+.input-area input{flex:1;padding:14px 16px;border-radius:12px;border:2px solid rgba(255,255,255,.1);background:var(--card);color:var(--text);font-size:16px;outline:none;transition:.2s}
+.input-area input:focus{border-color:var(--primary)}
+.input-area button{background:var(--primary);color:#fff;border:none;border-radius:12px;padding:14px 24px;font-size:15px;font-weight:600;cursor:pointer;transition:.2s;white-space:nowrap}
+.input-area button:active{transform:scale(.97)}
+
+.game-controls{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0;justify-content:center}
+.game-controls button{background:var(--card);color:var(--text);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:10px 18px;font-size:13px;cursor:pointer;transition:.2s}
+.game-controls button:active{transform:scale(.95)}
+.game-controls button.primary{background:var(--primary);border-color:var(--primary)}
+.game-controls button.danger{background:#dc2626;border-color:#dc2626}
+
+/* ===== WORDLIST ===== */
+.wordlist-section{display:none}
+
+/* ===== LEAD FORM ===== */
+.lead-section{max-width:500px;margin:0 auto;padding:20px 0}
+.lead-section h2{font-size:22px;font-weight:700;text-align:center;margin-bottom:8px}
+.lead-section .sub{color:var(--muted);text-align:center;font-size:14px;margin-bottom:24px}
+.form-group{margin-bottom:16px}
+.form-group label{font-size:13px;color:var(--muted);display:block;margin-bottom:6px}
+.form-group input,.form-group textarea,.form-group select{width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:var(--card);color:var(--text);font-size:15px;outline:none;transition:.2s}
+.form-group input:focus,.form-group textarea:focus{border-color:var(--primary)}
+.form-group textarea{min-height:80px;resize:vertical}
+.form-group select{appearance:none}
+.submit-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--primary),#7c3aed);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;transition:.2s}
+.submit-btn:active{transform:scale(.97)}
+
+.contact-info{text-align:center;margin-top:24px;padding:20px;background:var(--card);border-radius:12px}
+.contact-info p{color:var(--muted);font-size:13px;margin-bottom:4px}
+.contact-info .strong{color:var(--text);font-size:16px;font-weight:600}
+
+/* ===== FOOTER ===== */
+footer{text-align:center;padding:24px;color:var(--muted);font-size:12px;border-top:1px solid rgba(255,255,255,.06);margin-top:40px}
+
+/* ===== TOAST ===== */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--card);color:var(--text);padding:12px 24px;border-radius:12px;font-size:14px;box-shadow:0 8px 32px rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.08);z-index:999;opacity:0;transition:.3s;pointer-events:none}
+.toast.show{opacity:1}
+
+@media(max-width:480px){
+  .features{grid-template-columns:1fr}
+  .hero h1{font-size:28px}
+  .word-display .en{font-size:28px}
+  .nav-links a{font-size:12px;padding:4px 10px}
+  .stats-bar{gap:6px}
+  .stat{padding:8px 10px}
+  .stat .val{font-size:16px}
+}
+</style>
+</head>
+<body>
+
+<nav>
+<div class="container">
+  <div class="logo"><img src="logo.png" alt="高斗云"></div>
+  <span class="tag">单词速记</span>
+  <div class="nav-links">
+    <a href="#" data-section="brand" class="active">品牌</a>
+    <a href="#" data-section="game">速打</a>
+    <a href="#" data-section="report">学案</a>
+    <a href="#" data-section="lead">咨询</a>
+  </div>
+</div>
+</nav>
+
+<div class="container">
+
+<!-- ===== 品牌页 ===== -->
+<div class="section active" id="section-brand">
+  <div class="hero">
+    <div class="subtitle">右脑图像记忆法 · 高斗云</div>
+    <h1>高斗云 · 右脑图像记忆法背单词</h1>
+    <p>运用AI智能算法深度分析学习数据，动态调整学习内容与难度。<br>小升初、中考、高考、四六级、考研、剑桥、托福、雅思等主流英语考试全覆盖。</p>
+  </div>
+
+  <div class="features">
+    <div class="feature-card"><h3>右脑图像记忆</h3><p>单词与生动画面结合，激活右脑记忆潜能，记得快、记得牢、忘不掉</p></div>
+    <div class="feature-card"><h3>全年龄适用</h3><p>专为不同年龄段学习者量身定制个性化学习路径，从入门到高阶一路进阶</p></div>
+    <div class="feature-card"><h3>自适应学习</h3><p>运用AI智能算法深度分析学习数据，动态调整学习内容与难度，千人千面</p></div>
+    <div class="feature-card"><h3>个性化建议</h3><p>依托大数据技术，生成详尽学习分析报告与个性化提升建议，进步看得见</p></div>
+  </div>
+
+  <div class="brand-section">
+    <h2>学习五步法</h2>
+    <div class="steps">
+      <div class="step"><span class="num">01</span><span class="label">AI智能测评</span></div>
+      <div class="step"><span class="num">02</span><span class="label">匹配学习等级</span></div>
+      <div class="step"><span class="num">03</span><span class="label">右脑图像记忆</span></div>
+      <div class="step"><span class="num">04</span><span class="label">自适应训练</span></div>
+      <div class="step"><span class="num">05</span><span class="label">学案分析报告</span></div>
+    </div>
+  </div>
+
+  <div class="brand-section">
+    <h2>为什么选择高斗云</h2>
+    <p>传统背单词方式效率低下，死记硬背、容易遗忘。高斗云右脑图像记忆法，将单词与生动画面深度绑定，激活右脑记忆潜能。告别枯燥的机械重复，让记单词像看图片一样轻松自然。</p>
+    <p style="color:var(--accent);font-weight:600;font-size:15px;margin-top:8px">不是简单的背单词工具，而是一套完整的AI伴学系统。</p>
+  </div>
+
+  <div class="brand-section">
+    <h2>立即体验</h2>
+    <div style="background:var(--card);border-radius:12px;padding:20px;text-align:center;border:1px solid rgba(255,255,255,.06)">
+      <div style="font-size:36px;font-weight:900;color:var(--accent);margin-bottom:4px">免费体验</div>
+      <div style="color:var(--muted);font-size:13px;margin-bottom:16px">立即开始你的AI个性化学习之旅</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;text-align:left;font-size:13px;color:var(--muted)">
+        <div>— AI智能测评</div>
+        <div>— 自适应学习系统</div>
+        <div>— 个性化学习路径</div>
+        <div>— 详细分析报告</div>
+        <div>— 专属学案推送</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align:center;margin:24px 0">
+    <a href="#" onclick="switchSection('lead');return false" style="display:inline-block;background:linear-gradient(135deg,var(--primary),#7c3aed);color:#fff;padding:14px 40px;border-radius:12px;font-size:16px;font-weight:700;text-decoration:none">立即体验</a>
+  </div>
+</div>
+
+<!-- ===== 单词速打 ===== -->
+<div class="section" id="section-game">
+  <div class="game-header">
+    <h2>单词速打</h2>
+    <p class="mode-hint" id="mode-hint">高斗云 · 右脑图像记忆法</p>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat"><div class="val" id="g-score">0</div><div class="lbl">得分</div></div>
+    <div class="stat"><div class="val" id="g-count">0/50</div><div class="lbl">进度</div></div>
+    <div class="stat"><div class="val" id="g-acc">0%</div><div class="lbl">正确率</div></div>
+    <div class="stat"><div class="val" id="g-streak">0</div><div class="lbl">连击</div></div>
+  </div>
+
+  <div class="word-display" id="word-display">
+    <div class="hint">点击"开始游戏"进入挑战</div>
+  </div>
+
+  <div class="input-area">
+    <input type="text" id="answer-input" placeholder="输入英文单词..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" disabled>
+    <button id="submit-btn" disabled>确定</button>
+  </div>
+
+  <div class="game-controls">
+    <button class="primary" id="start-btn">开始游戏</button>
+    <button id="skip-btn" disabled>跳过</button>
+    <button id="mode-btn">中文→英文</button>
+  </div>
+
+</div>
+
+<!-- ===== 学案历程 ===== -->
+<div class="section" id="section-report">
+  <div class="game-header">
+    <h2>学案历程</h2>
+    <p style="color:var(--muted);font-size:14px">查看所有历史学习报告与学案建议</p>
+  </div>
+  <div id="report-history">
+    <div style="text-align:center;padding:40px 0;color:var(--muted);font-size:14px">还没有学习记录</div>
+  </div>
+</div>
+
+<!-- ===== 合作/引流 ===== -->
+<div class="section" id="section-lead">
+  <div class="lead-section">
+    <h2>联系老师</h2>
+    <p class="sub">添加上方微信或填写表单，我们会在24小时内联系你</p>
+
+    <div class="contact-info" style="margin-bottom:24px">
+      <p>扫码添加老师微信</p>
+      <div style="margin:12px auto;text-align:center">
+          <img src="qrcode.jpg" alt="扫码添加老师微信" style="width:120px;height:120px;border-radius:8px;object-fit:cover">
+          <div style="font-size:13px;color:var(--muted);margin-top:6px">扫码添加老师微信<br>获取完整分析报告 · 生成专属学案</div>
+        </div>
+      <div class="strong">添加时备注"背单词体验"</div>
+    </div>
+
+    <form id="lead-form">
+      <div class="form-group">
+        <label>你的姓名</label>
+        <input type="text" id="lead-name" placeholder="请输入姓名">
+      </div>
+      <div class="form-group">
+        <label>手机号/微信</label>
+        <input type="text" id="lead-contact" placeholder="方便我们联系你">
+      </div>
+      <div class="form-group">
+        <label>身份</label>
+        <select id="lead-type">
+          <option value="">请选择</option>
+          <option value="机构">教培机构</option>
+          <option value="老师">老师</option>
+          <option value="家长">家长</option>
+          <option value="创业">创业者</option>
+          <option value="其他">其他</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>留言</label>
+        <textarea id="lead-msg" placeholder="聊聊你的需求..."></textarea>
+      </div>
+      <button type="button" class="submit-btn" id="lead-submit">提交信息</button>
+    </form>
+  </div>
+</div>
+
+</div>
+
+<footer>
+  高斗云 &nbsp;·&nbsp; 右脑图像记忆法<br>
+  <span style="opacity:.5">© 2026 高斗云单词速记</span>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== WORD BANK =====
+const WORD_BANK = [
+  {en:"abandon",cn:"放弃",meaning:"抛弃、放弃"},
+  {en:"absorb",cn:"吸收",meaning:"吸收、吸引"},
+  {en:"abstract",cn:"抽象的",meaning:"抽象的、理论上的"},
+  {en:"access",cn:"进入",meaning:"通道、进入"},
+  {en:"achieve",cn:"实现",meaning:"实现、达到"},
+  {en:"acquire",cn:"获得",meaning:"获得、学到"},
+  {en:"adapt",cn:"适应",meaning:"适应、改编"},
+  {en:"adequate",cn:"足够的",meaning:"充足的、足够的"},
+  {en:"advance",cn:"前进",meaning:"前进、推进"},
+  {en:"adventure",cn:"冒险",meaning:"冒险、惊险"},
+  {en:"affect",cn:"影响",meaning:"影响、感动"},
+  {en:"afford",cn:"负担得起",meaning:"负担得起、提供"},
+  {en:"ancient",cn:"古老的",meaning:"古老的、古代的"},
+  {en:"annual",cn:"每年的",meaning:"每年的、年度的"},
+  {en:"anxiety",cn:"焦虑",meaning:"焦虑、担忧"},
+  {en:"apparent",cn:"明显的",meaning:"明显的、表面的"},
+  {en:"appeal",cn:"吸引",meaning:"吸引、呼吁"},
+  {en:"approach",cn:"接近",meaning:"接近、方法"},
+  {en:"approve",cn:"批准",meaning:"批准、赞成"},
+  {en:"arrange",cn:"安排",meaning:"安排、整理"},
+  {en:"assess",cn:"评估",meaning:"评估、评定"},
+  {en:"assign",cn:"分配",meaning:"分配、布置"},
+  {en:"assist",cn:"帮助",meaning:"帮助、协助"},
+  {en:"assume",cn:"假设",meaning:"假设、承担"},
+  {en:"atmosphere",cn:"气氛",meaning:"气氛、大气层"},
+  {en:"attach",cn:"附上",meaning:"附上、连接"},
+  {en:"attempt",cn:"尝试",meaning:"尝试、企图"},
+  {en:"attend",cn:"参加",meaning:"参加、出席"},
+  {en:"attitude",cn:"态度",meaning:"态度、看法"},
+  {en:"attract",cn:"吸引",meaning:"吸引、引起"},
+  {en:"balance",cn:"平衡",meaning:"平衡、余额"},
+  {en:"barrier",cn:"障碍",meaning:"障碍、屏障"},
+  {en:"behave",cn:"表现",meaning:"表现、举止"},
+  {en:"benefit",cn:"利益",meaning:"利益、好处"},
+  {en:"bitter",cn:"苦的",meaning:"苦的、痛苦的"},
+  {en:"blame",cn:"责备",meaning:"责备、归咎于"},
+  {en:"border",cn:"边界",meaning:"边界、边境"},
+  {en:"bother",cn:"打扰",meaning:"打扰、烦恼"},
+  {en:"boundary",cn:"界限",meaning:"界限、分界线"},
+  {en:"brilliant",cn:"灿烂的",meaning:"辉煌的、灿烂的"},
+  {en:"budget",cn:"预算",meaning:"预算、经费"},
+  {en:"burden",cn:"负担",meaning:"负担、重任"},
+  {en:"calculate",cn:"计算",meaning:"计算、估计"},
+  {en:"campaign",cn:"运动",meaning:"运动、战役"},
+  {en:"capable",cn:"有能力的",meaning:"有能力的、能干的"},
+  {en:"capture",cn:"捕获",meaning:"捕获、夺取"},
+  {en:"caution",cn:"谨慎",meaning:"谨慎、警告"},
+  {en:"celebrate",cn:"庆祝",meaning:"庆祝、赞美"},
+  {en:"challenge",cn:"挑战",meaning:"挑战、质疑"},
+  {en:"character",cn:"性格",meaning:"性格、特征、角色"},
+];
+
+let words = [];
+let currentIndex = 0;
+let score = 0;
+let correct = 0;
+let total = 0;
+let streak = 0;
+let maxStreak = 0;
+let isPlaying = false;
+let isCnMode = false;
+let checking = false;
+let gameWords = [];
+let results = [];
+
+// ===== DOM =====
+const sections = {brand:0,game:1,lead:2};
+const wordDisplay = document.getElementById('word-display');
+const answerInput = document.getElementById('answer-input');
+const submitBtn = document.getElementById('submit-btn');
+const startBtn = document.getElementById('start-btn');
+const skipBtn = document.getElementById('skip-btn');
+const modeBtn = document.getElementById('mode-btn');
+const gScore = document.getElementById('g-score');
+const gCount = document.getElementById('g-count');
+const gAcc = document.getElementById('g-acc');
+const gStreak = document.getElementById('g-streak');
+// wordGrid and wordlistStatus removed - not used
+const toast = document.getElementById('toast');
+
+// ===== NAVIGATION =====
+document.querySelectorAll('[data-section]').forEach(a=>{
+  a.addEventListener('click',e=>{
+    e.preventDefault();
+    switchSection(a.dataset.section);
+  });
+});
+function switchSection(name){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById('section-'+name).classList.add('active');
+  document.querySelectorAll('[data-section]').forEach(a=>a.classList.remove('active'));
+  document.querySelector(`[data-section="${name}"]`).classList.add('active');
+}
+
+// ===== TOAST =====
+function showToast(msg){
+  toast.textContent=msg;
+  toast.classList.add('show');
+  setTimeout(()=>toast.classList.remove('show'),2500);
+}
+
+// ===== GAME =====
+function shuffle(arr){
+  for(let i=arr.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
+  }
+  return arr;
+}
+
+// Shuffle and pick 50 words
+function initGame(){
+  words = shuffle([...WORD_BANK]).slice(0,50);
+  gameWords = words.map(w=>({...w,status:'pending'}));
+  currentIndex = 0;
+  score = 0;
+  correct = 0;
+  total = 0;
+  streak = 0;
+  maxStreak = 0;
+  isPlaying = true;
+  results = [];
+  updateStats();
+  showWord();
+  answerInput.disabled = false;
+  modeBtn.disabled = true;
+  modeBtn.style.opacity = '0.4';
+  modeBtn.style.cursor = 'not-required';
+  answerInput.focus();
+  submitBtn.disabled = false;
+  skipBtn.disabled = false;
+  startBtn.textContent = '重新开始';
+}
+
+function showWord(){
+  if(currentIndex >= gameWords.length){
+    endGame();
+    return;
+  }
+  const w = gameWords[currentIndex];
+  if(isCnMode){
+    // 中译英：显示中文，输入英文
+    wordDisplay.innerHTML = `<div class="en">${w.cn}</div><div class="hint">请输入对应的英文单词</div><div class="count">${currentIndex+1}/${gameWords.length}</div>`;
+  } else {
+    // 英译中：显示英文，输入中文
+    wordDisplay.innerHTML = `<div class="en">${w.en}</div><div class="hint">请输入对应的中文释义</div><div class="count">${currentIndex+1}/${gameWords.length}</div>`;
+  }
+  answerInput.value = '';
+  answerInput.focus();
+}
+
+function checkAnswer(){
+  if(!isPlaying || currentIndex >= gameWords.length) return;
+  if(checking) return;
+  checking = true;
+  const w = gameWords[currentIndex];
+  const ans = answerInput.value.trim().toLowerCase();
+  if(!ans){ checking = false; return; }
+
+  total++;
+  if(isCnMode ? (ans === w.en) : (ans === w.cn || ans === w.meaning)){
+    correct++;
+    score += 10 + streak * 2;
+    streak++;
+    if(streak > maxStreak) maxStreak = streak;
+    w.status = 'correct';
+    playCorrectSound();
+    if(isCnMode){
+      wordDisplay.innerHTML = `<div class="result correct">✓ ${w.en}</div><div class="result correct"><span class="meaning">${w.cn}</span></div>`;
+    } else {
+      wordDisplay.innerHTML = `<div class="result correct">✓ ${w.cn}</div><div class="result correct"><span class="meaning">${w.en}</span></div>`;
+    }
+  } else {
+    streak = 0;
+    w.status = 'wrong';
+    playWrongSound();
+    if(isCnMode){
+      wordDisplay.innerHTML = `<div class="result wrong">✗ 你输入: ${ans}</div><div class="result wrong"><span class="meaning">正确答案: ${w.en} · ${w.cn}</span></div>`;
+    } else {
+      wordDisplay.innerHTML = `<div class="result wrong">✗ 你输入: ${ans}</div><div class="result wrong"><span class="meaning">正确答案: ${w.cn} · ${w.en}</span></div>`;
+    }
+  }
+  results.push({word:w,correct:((isCnMode && ans === w.en) || (!isCnMode && (ans === w.cn || ans === w.meaning)))});
+  currentIndex++;
+  updateStats();
+  setTimeout(()=>{ checking = false; showWord(); },1000);
+}
+
+function skipWord(){
+  if(!isPlaying || currentIndex >= gameWords.length) return;
+  if(checking) return;
+  checking = true;
+  const w = gameWords[currentIndex];
+  streak = 0;
+  w.status = 'wrong';
+  if(isCnMode){
+    wordDisplay.innerHTML = `<div class="result wrong">✗ 跳过</div><div class="result wrong"><span class="meaning">正确答案: ${w.en} &nbsp;·&nbsp; ${w.cn}</span></div>`;
+  } else {
+    wordDisplay.innerHTML = `<div class="result wrong">✗ 跳过</div><div class="result wrong"><span class="meaning">正确答案: ${w.cn} &nbsp;·&nbsp; ${w.en}</span></div>`;
+  }
+  results.push({word:w,correct:false});
+  currentIndex++;
+  total++;
+  updateStats();
+  setTimeout(()=>{ checking = false; showWord(); },800);
+}
+
+function endGame(){
+  checking = false;
+  playEndSound();
+  isPlaying = false;
+  const acc = total > 0 ? Math.round(correct/total*100) : 0;
+  wordDisplay.innerHTML = `
+    <div style="font-size:22px;font-weight:700;margin-bottom:12px">本轮完成</div>
+    <div style="color:var(--muted);font-size:14px;line-height:2">
+      得分: ${score} &nbsp;|&nbsp; 正确: ${correct}/${total}<br>
+      正确率: ${acc}% &nbsp;|&nbsp; 最高连击: ${maxStreak}
+    </div>
+    <button id="report-btn" style="margin-top:16px;padding:12px 32px;background:linear-gradient(135deg,#f59e0b,#f97316);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer">生成学案报告</button>
+  `;
+  answerInput.disabled = true;
+  modeBtn.disabled = false;
+  modeBtn.style.opacity = '1';
+  modeBtn.style.cursor = 'pointer';
+  submitBtn.disabled = true;
+  skipBtn.disabled = true;
+  startBtn.textContent = '再来一次';
+  document.getElementById('report-btn').addEventListener('click',generateReport);
+}
+
+function updateStats(){
+  gScore.textContent = score;
+  gCount.textContent = `${currentIndex}/${gameWords.length}`;
+  const acc = total > 0 ? Math.round(correct/total*100) : 0;
+  gAcc.textContent = acc + '%';
+  gStreak.textContent = streak;
+}
+
+function toggleMode(){
+  if(isPlaying) return;
+  isCnMode = !isCnMode;
+  modeBtn.textContent = isCnMode ? '英译中' : '中译英';
+}
+
+function renderWordList(){
+  // word list display removed - simplified
+}
+
+// ===== 学案报告生成 =====
+function generateReport(){
+  if(results.length === 0){
+    showToast('还没有练习数据，请先完成一轮单词速打');
+    return;
+  }
+  const rate = total > 0 ? Math.round(correct/total*100) : 0;
+  const wrongResults = results.filter(r => !r.correct);
+  const correctResults = results.filter(r => r.correct);
+  
+  let grade, gradeColor, gradeBg;
+  if(rate >= 90){ grade='A+'; gradeColor='#d97706'; gradeBg='#fef3c7'; }
+  else if(rate >= 75){ grade='A'; gradeColor='#16a34a'; gradeBg='#f0fdf4'; }
+  else if(rate >= 60){ grade='B'; gradeColor='#2563eb'; gradeBg='#eff6ff'; }
+  else if(rate >= 40){ grade='C'; gradeColor='#9333ea'; gradeBg='#faf5ff'; }
+  else { grade='D'; gradeColor='#dc2626'; gradeBg='#fef2f2'; }
+  
+  const now = new Date();
+  const dateStr = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0')+' '+String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+  
+  // 考试对标
+  function getExamBenchmark(speed){
+    if(speed >= 200) return '已超越高考要求，对标大学四级水平';
+    if(speed >= 150) return '已达中考优秀水平，接近高考要求';
+    if(speed >= 80) return '已达初一优秀水平，中考准备中';
+    if(speed >= 50) return '已达小学高年级水平，稳步提升中';
+    return '需从基础词汇开始积累';
+  }
+  
+  // 错词HTML
+  let wrongHtml = '';
+  if(wrongResults.length > 0){
+    wrongHtml = wrongResults.map((r,i) => 
+      '<tr><td class="wc">'+(i+1)+'</td><td class="we">'+r.word.en+'</td><td class="wz">'+r.word.cn+'</td><td class="wn">'+r.word.meaning+'</td></tr>'
+    ).join('');
+  }
+  
+  // 正确HTML
+  let correctHtml = '';
+  if(correctResults.length > 0){
+    correctHtml = correctResults.slice(0,20).map((r,i) => 
+      '<span class="good-word">'+r.word.en+'</span>'
+    ).join('');
+  }
+  
+  // 阶段划分建议
+  function getPhasePlans(){
+    if(rate < 40){
+      return '<div class="plan-grid">'+
+        '<div class="plan-card p1"><div class="pt">基础构建期</div><div class="pd">每天15个核心高频词<br>右脑图像联想记忆<br>建议用时: 2周</div></div>'+
+        '<div class="plan-card p3"><div class="pt">强化训练期</div><div class="pd">错词反复练习<br>增加练习频次<br>建议用时: 1-2周</div></div>'+
+        '<div class="plan-card p2"><div class="pt">巩固提升期</div><div class="pd">核心词汇过关<br>建立每日习惯<br>建议用时: 2-3周</div></div>'+
+        '</div>';
+    } else if(rate < 60){
+      return '<div class="plan-grid">'+
+        '<div class="plan-card p1"><div class="pt">基础巩固期</div><div class="pd">每日15-20词<br>重点攻克错词<br>建议用时: 1-2周</div></div>'+
+        '<div class="plan-card p3"><div class="pt">强化训练期</div><div class="pd">错词反复练习<br>增加练习频次<br>建议用时: 1-2周</div></div>'+
+        '<div class="plan-card p2"><div class="pt">巩固提升期</div><div class="pd">核心词汇过关<br>建立每日习惯<br>建议用时: 2-3周</div></div>'+
+        '</div>';
+    } else if(rate < 75){
+      return '<div class="plan-grid">'+
+        '<div class="plan-card p1"><div class="pt">错词攻克期</div><div class="pd">重点复习本轮错词<br>建立专属错题本<br>建议用时: 1周</div></div>'+
+        '<div class="plan-card p3"><div class="pt">强化训练期</div><div class="pd">挑战更高难度<br>限时模式训练<br>建议用时: 1-2周</div></div>'+
+        '<div class="plan-card p2"><div class="pt">综合应用期</div><div class="pd">结合阅读巩固<br>词汇+语法同步<br>提升英语综合能力</div></div>'+
+        '</div>';
+    } else if(rate < 90){
+      return '<div class="plan-grid">'+
+        '<div class="plan-card p3"><div class="pt">错词清零期</div><div class="pd">错词隔天再测<br>确保彻底掌握<br>建议用时: 3-5天</div></div>'+
+        '<div class="plan-card p1"><div class="pt">拓展提升期</div><div class="pd">挑战困难模式<br>扩大词汇储备<br>建议用时: 持续</div></div>'+
+        '<div class="plan-card p2"><div class="pt">综合冲刺期</div><div class="pd">模拟考试场景<br>全面提升应试能力</div></div>'+
+        '</div>';
+    } else {
+      return '<div class="plan-grid">'+
+        '<div class="plan-card p3"><div class="pt">巩固巩固期</div><div class="pd">保持每日练习习惯<br>扩大词汇覆盖范围</div></div>'+
+        '<div class="plan-card p1"><div class="pt">拓展提升期</div><div class="pd">挑战高阶场景词汇<br>阅读原文文章练习<br>建议用时: 持续</div></div>'+
+        '<div class="plan-card p2"><div class="pt">综合应用期</div><div class="pd">结合写作与口语<br>输出式巩固训练</div></div>'+
+        '</div>';
+    }
+  }
+  
+  // 记忆阶段分解
+  const memoryPhases = [
+    {day:1,label:'初识阶段',desc:'首次记忆，建立初步印象','tasks':'看图像 / 读单词 / 理解释义'},
+    {day:2,label:'巩固阶段',desc:'复习+测试，加深印象','tasks':'英译中测试 / 中译英测试'},
+    {day:4,label:'强化阶段',desc:'间隔复习，巩固记忆','tasks':'限时速打 / 错词重测'},
+    {day:7,label:'复习阶段',desc:'一周回顾，确保掌握','tasks':'综合测试 / 错题复查'}
+  ];
+  
+  const gradeDesc = rate >= 90 ? '掌握扎实，反应迅速，已具备良好的词汇基础' :
+    rate >= 75 ? '整体掌握较好，部分词汇需要巩固加深' :
+    rate >= 60 ? '核心词汇有一定基础，但存在明显薄弱环节' :
+    rate >= 40 ? '基础词汇掌握不足，需系统性地补充和强化' :
+    '词汇基础较为薄弱，建议从高频核心词汇开始系统学习';
+  
+  const estimatedSpeed = Math.round(score / Math.max(1,total) * 200);
+  
+  const reportHTML = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>高斗云 学案报告</title><style>' +
+    'body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;background:#f0f2f5;margin:0;padding:24px;color:#1f2937}' +
+    '@media print{body{background:#fff;padding:12px}.no-print{display:none!important}}' +
+    '@page{margin:12mm 8mm}' +
+    '.report{max-width:860px;margin:0 auto;background:#fff;border-radius:18px;padding:36px 40px;box-shadow:0 2px 16px rgba(0,0,0,.06)}' +
+    '.header{display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid #f59e0b;padding-bottom:16px;margin-bottom:20px}' +
+    '.header-left h1{font-size:22px;margin:0;color:#111827}' +
+    '.header-left .sub{color:#6b7280;font-size:12px;margin-top:4px}' +
+    '.header-right{text-align:right}' +
+    '.header-right .date{color:#9ca3af;font-size:12px}' +
+    '.grade-circle{display:inline-flex;align-items:center;justify-content:center;width:56px;height:56px;border-radius:50%;font-size:24px;font-weight:800}' +
+    '.overview{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:20px 0}' +
+    '.ov-item{background:#f9fafb;border-radius:12px;padding:14px 10px;text-align:center;border:1px solid #f3f4f6}' +
+    '.ov-item .ol{color:#9ca3af;font-size:11px}.ov-item .ov{font-size:20px;font-weight:700;color:#111827;margin-top:3px}' +
+    '.ov-item .od{color:#6b7280;font-size:11px;margin-top:2px}' +
+    '.section{margin:22px 0}.section h3{font-size:15px;margin:0 0 10px 0;padding-bottom:6px;border-bottom:1.5px solid #fde68a;color:#92400e}' +
+    '.exam-benchmark{background:#fefce8;border-radius:12px;padding:14px 18px;margin:12px 0;border:1px solid #fde68a;font-size:13px;color:#78350f}' +
+    '.exam-benchmark strong{color:#92400e}' +
+    '.table-wrap{overflow-x:auto}.wrong-table{width:100%;border-collapse:collapse;font-size:13px;border-radius:10px;overflow:hidden}' +
+    '.wrong-table th{background:#fef3c7;color:#92400e;padding:9px 12px;text-align:left;font-weight:600}' +
+    '.wrong-table td{padding:8px 12px;border-bottom:1px solid #f3f4f6}' +
+    '.wrong-table tr:hover{background:#fffbeb}' +
+    '.wrong-table .wc{width:32px;color:#9ca3af;text-align:center}' +
+    '.wrong-table .we{font-weight:600;color:#111827}' +
+    '.wrong-table .wz{color:#374151}' +
+    '.wrong-table .wn{color:#059669;font-size:12px}' +
+    '.plan-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0}' +
+    '.plan-card{border-radius:12px;padding:16px;text-align:center}' +
+    '.plan-card.p1{background:#fef3c7}.plan-card.p2{background:#e0f2fe}.plan-card.p3{background:#f0fdf4}' +
+    '.plan-card .pt{font-size:13px;font-weight:700;margin-bottom:4px}' +
+    '.plan-card .pd{font-size:11px;color:#6b7280;line-height:1.5}' +
+    '.good-words-wrap{padding:10px 0}' +
+    '.good-word{display:inline-block;background:#f0fdf4;color:#15803d;padding:4px 12px;border-radius:14px;font-size:13px;margin:3px 4px;border:1px solid #bbf7d0}' +
+    '.tips-box{background:#eef2ff;border-radius:12px;padding:18px 20px;margin:16px 0;border-left:4px solid #6366f1}' +
+    '.tips-box h4{color:#4338ca;margin:0 0 8px 0;font-size:14px}' +
+    '.tips-box ul{margin:0;padding-left:18px;color:#374151;font-size:13px;line-height:1.9}' +
+    '.memory-timeline{display:flex;gap:8px;margin:12px 0;flex-wrap:wrap}' +
+    '.memory-phase{flex:1;min-width:140px;background:#f9fafb;border-radius:10px;padding:14px;border:1px solid #f3f4f6}' +
+    '.memory-phase .mp-day{font-size:11px;color:#9ca3af}' +
+    '.memory-phase .mp-label{font-size:14px;font-weight:700;color:#111827;margin:2px 0}' +
+    '.memory-phase .mp-desc{font-size:11px;color:#6b7280}' +
+    '.memory-phase .mp-tasks{font-size:10px;color:#9ca3af;margin-top:6px;padding-top:6px;border-top:1px dashed #e5e7eb}' +
+    '.footer{text-align:center;color:#d1d5db;font-size:11px;margin-top:24px;padding-top:14px;border-top:1px solid #f3f4f6}' +
+    '.action-bar{text-align:center;margin:24px 0 0 0}' +
+    '.print-btn{display:inline-block;padding:12px 36px;background:linear-gradient(135deg,#f59e0b,#f97316);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;margin:0 6px}' +
+    '.print-btn.sec{background:#6b7280}' +
+    '@media(max-width:600px){.overview{grid-template-columns:repeat(2,1fr)}.plan-grid{grid-template-columns:1fr}.header{flex-direction:column;text-align:center}.header-right{margin-top:8px}.memory-timeline{flex-direction:column}}' +
+    '.tag-diff{display:inline-block;background:#e0e7ff;color:#4338ca;padding:2px 10px;border-radius:10px;font-size:11px;font-weight:600}' +
+    '</style></head><body><div class="report">' +
+    
+    // 头部
+    '<div class="header"><div class="header-left"><h1>高斗云 学案报告</h1><div class="sub">右脑图像记忆法 &middot; AI伴学评估</div></div>' +
+    '<div class="header-right"><div class="date">报告时间: '+dateStr+'</div><div class="grade-circle" style="background:'+gradeBg+';color:'+gradeColor+'">'+grade+'</div></div></div>' +
+    
+    // 综合评估
+    '<p style="font-size:14px;color:#6b7280;text-align:center;margin:0 0 6px 0">'+gradeDesc+'</p>' +
+    '<div class="overview">' +
+    '<div class="ov-item"><div class="ol">得分</div><div class="ov">'+score+'</div><div class="od">满分 '+(total*10)+'</div></div>' +
+    '<div class="ov-item"><div class="ol">正确率</div><div class="ov">'+rate+'%</div><div class="od">'+correct+'/'+total+' 正确</div></div>' +
+    '<div class="ov-item"><div class="ol">预估速度</div><div class="ov">'+estimatedSpeed+'</div><div class="od">反应速度评分</div></div>' +
+    '<div class="ov-item"><div class="ol">最高连击</div><div class="ov">'+maxStreak+'x</div><div class="od">'+(maxStreak>=5?'手速不错':maxStreak>=3?'状态稳定':'继续加油')+'</div></div></div>' +
+    
+    // 考试对标
+    '<div class="exam-benchmark"><strong>考试对标:</strong> '+getExamBenchmark(estimatedSpeed)+'<br>' +
+    '<strong>本轮词汇:</strong> '+gameWords.length+'个 &nbsp;|&nbsp; <strong>错词:</strong> '+wrongResults.length+'个 &nbsp;|&nbsp; <strong>用时:</strong> 实时测评</div>' +
+    
+    // 正确词汇
+    '<div class="section"><h3>已掌握词汇 ('+correctResults.length+'个)</h3>' +
+    '<div class="good-words-wrap">'+(correctHtml||'<p style="color:#6b7280;font-size:13px">暂无已掌握词汇</p>')+'</div></div>' +
+    
+    // 错词回顾
+    '<div class="section"><h3>错词回顾 ('+wrongResults.length+'个)</h3>' +
+    (wrongResults.length > 0 ?
+    '<div class="table-wrap"><table class="wrong-table"><tr><th></th><th>英文</th><th>中文释义</th><th>详细含义</th></tr>'+wrongHtml+'</table></div>' :
+    '<p style="color:#16a34a;font-size:14px;padding:12px 0;text-align:center">全部答对，没有错词</p>') + '</div>' +
+    
+    // 学习规划
+    '<div class="section"><h3>学习规划建议</h3>'+getPhasePlans()+'</div>' +
+    
+    // 记忆周期分解
+    '<div class="section"><h3>科学记忆周期</h3>' +
+    '<div class="memory-timeline">' +
+    memoryPhases.map(p => 
+      '<div class="memory-phase"><div class="mp-day">第'+p.day+'天</div><div class="mp-label">'+p.label+'</div><div class="mp-desc">'+p.desc+'</div><div class="mp-tasks">'+p.tasks+'</div></div>'
+    ).join('') +
+    '</div></div>' +
+    
+    // 个性化提升建议
+    '<div class="tips-box"><h4>个性化提升建议</h4><ul>' +
+    (rate < 40 ? '<li>词汇基础薄弱，建议从核心高频词汇开始，每天15个新词+复习旧词</li><li>使用右脑图像记忆法，把单词与生动画面联系起来，记起来更轻松</li><li>先使用"英译中"模式建立理解，再用"中译英"练习输出</li><li>建议家长或老师协助制定每日学习计划，养成固定学习节奏</li>' :
+     rate < 60 ? '<li>有一定基础但不够扎实，重点攻克本次错词，它们是提升的关键</li><li>每天坚持20分钟单词训练，保持语感不断进步</li><li>尝试将新单词用在日常句子中，加深理解和记忆</li><li>建议每周做一次测试，检验学习效果，逐步提高正确率</li>' :
+     rate < 75 ? '<li>掌握情况良好，建议将错词整理到专属错题本，定期回顾</li><li>尝试"中译英"模式来锻炼输出能力，不仅看得懂还要拼得出</li><li>适当增加每日训练量，向更高正确率冲刺</li><li>可开始结合简单段落阅读，在具体语境中巩固词汇</li>' :
+     rate < 90 ? '<li>表现优秀，错词不多但需要重视，建议标记后隔天再次测试</li><li>挑战困难模式，在限时压力下训练反应速度</li><li>适当扩大词汇范围，预习更高年级的词汇</li><li>坚持每天训练，稳步朝着满分神手的目标前进</li>' :
+     '<li>本轮词汇已全部掌握，表现非常出色</li><li>建议扩大词汇范围，开始接触更高级别的词汇</li><li>可挑战更高难度的综合训练模式</li><li>保持每天练习的习惯，综合能力将稳步提升</li>') +
+    '</ul></div>' +
+    
+    // 底部
+    '<div class="footer">高斗云 &middot; 右脑图像记忆法<br>扫码添加老师微信，获取完整分析报告及专属学案</div>' +
+    
+    // 操作按钮
+    '<div class="action-bar no-print"><button class="print-btn" onclick="window.print()">导出为PDF / 打印</button></div>' +
+    
+    '</div></body></html>';
+  
+  const win = window.open('', '_blank');
+  win.document.write(reportHTML);
+  win.document.close();
+  
+  // 保存学案记录
+  saveReportToHistory({score, rate, correct, total, dateStr, grade, wrongCount:wrongResults.length, maxStreak});
+}
+
+// ===== 学案历史存储 =====
+function saveReportToHistory(report){
+  const history = JSON.parse(localStorage.getItem('gdReportHistory') || '[]');
+  history.unshift(report);
+  if(history.length > 50) history.length = 50;
+  localStorage.setItem('gdReportHistory', JSON.stringify(history));
+}
+
+function loadReportHistory(){
+  return JSON.parse(localStorage.getItem('gdReportHistory') || '[]');
+}
+
+function renderReportHistory(){
+  const container = document.getElementById('report-history');
+  const history = loadReportHistory();
+  if(history.length === 0){
+    container.innerHTML = '<div style="text-align:center;padding:40px 0;color:var(--muted);font-size:14px">还没有学习记录，完成一轮单词速打后会自动生成</div>';
+    return;
+  }
+  container.innerHTML = history.map((r,i) => {
+    const color = r.rate >= 90 ? '#16a34a' : r.rate >= 75 ? '#2563eb' : r.rate >= 60 ? '#f59e0b' : r.rate >= 40 ? '#9333ea' : '#dc2626';
+    const bg = r.rate >= 90 ? '#f0fdf4' : r.rate >= 75 ? '#eff6ff' : r.rate >= 60 ? '#fef3c7' : r.rate >= 40 ? '#faf5ff' : '#fef2f2';
+    return '<div style="background:var(--card);border-radius:12px;padding:14px 16px;margin-bottom:10px;border:1px solid rgba(255,255,255,.06);display:flex;align-items:center;gap:12px">' +
+      '<div style="width:40px;height:40px;border-radius:50%;background:'+bg+';color:'+color+';display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;flex-shrink:0">'+r.grade+'</div>' +
+      '<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;color:var(--text)">'+r.dateStr+'</div>' +
+      '<div style="font-size:12px;color:var(--muted);margin-top:2px">得分 '+r.score+' &middot; 正确率 '+r.rate+'% &middot; 错词 '+r.wrongCount+'个 &middot; 最高连击 '+r.maxStreak+'x</div></div></div>';
+  }).join('');
+}
+
+// ===== 导航切换时渲染学案 =====
+// 覆盖switchSection加入历史加载
+const _origSwitch = switchSection;
+switchSection = function(name){
+  _origSwitch(name);
+  if(name === 'report'){
+    renderReportHistory();
+  }
+};
+
+// ===== 音效系统 =====
+let audioCtx = null;
+function getAudioCtx(){
+  if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+
+function playCorrectSound(){
+  try{
+    const ctx = getAudioCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.frequency.value = 880;
+    osc.type = 'sine';
+    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.2);
+  } catch(e){}
+}
+
+function playWrongSound(){
+  try{
+    const ctx = getAudioCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.frequency.value = 280;
+    osc.type = 'sawtooth';
+    gain.gain.setValueAtTime(0.2, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.3);
+  } catch(e){}
+}
+
+function playStartSound(){
+  try{
+    const ctx = getAudioCtx();
+    [523, 659, 784].forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.frequency.value = freq;
+      osc.type = 'sine';
+      gain.gain.setValueAtTime(0.2, ctx.currentTime + i * 0.15);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + i * 0.15 + 0.2);
+      osc.start(ctx.currentTime + i * 0.15);
+      osc.stop(ctx.currentTime + i * 0.15 + 0.2);
+    });
+  } catch(e){}
+}
+
+function playEndSound(){
+  try{
+    const ctx = getAudioCtx();
+    [784, 523, 659, 784].forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.frequency.value = freq;
+      osc.type = 'triangle';
+      gain.gain.setValueAtTime(0.2, ctx.currentTime + i * 0.2);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + i * 0.2 + 0.3);
+      osc.start(ctx.currentTime + i * 0.2);
+      osc.stop(ctx.currentTime + i * 0.2 + 0.3);
+    });
+  } catch(e){}
+}
+
+// ===== KEYBOARD =====
+answerInput.addEventListener('keydown',e=>{
+  if(e.key === 'Enter') checkAnswer();
+});
+
+submitBtn.addEventListener('click',checkAnswer);
+skipBtn.addEventListener('click',skipWord);
+modeBtn.addEventListener('click',toggleMode);
+
+startBtn.addEventListener('click',()=>{
+  initGame();
+  showToast('游戏开始，输入英文单词后按 Enter 或点击确定');
+});
+
+// ===== LEAD FORM =====
+document.getElementById('lead-submit').addEventListener('click',()=>{
+  const name = document.getElementById('lead-name').value.trim();
+  const contact = document.getElementById('lead-contact').value.trim();
+  const type = document.getElementById('lead-type').value;
+  const msg = document.getElementById('lead-msg').value.trim();
+  if(!name || !contact){showToast('请填写姓名和联系方式');return;}
+  // Simulate send
+  showToast('提交成功！我们会在24小时内联系你');
+  document.getElementById('lead-name').value='';
+  document.getElementById('lead-contact').value='';
+  document.getElementById('lead-type').value='';
+  document.getElementById('lead-msg').value='';
+});
+
+// ===== INIT =====
+</script>
+<script>
+// 首次点击页面时激活音频上下文
+document.addEventListener('click', function initAudio(){
+  try{
+    var ctx = new (window.AudioContext || window.webkitAudioContext)();
+    ctx.resume();
+    // 存到全局
+    window.__audioReady = true;
+  } catch(e){}
+  document.removeEventListener('click', initAudio);
+}, {once: true});
+</script>
+</body>
+</html>

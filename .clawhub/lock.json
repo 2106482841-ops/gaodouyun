@@ -1,0 +1,55 @@
+{
+  "version": 1,
+  "skills": {
+    "openclaw-skill-vetter": {
+      "version": "1.0.0",
+      "installedAt": 1780941998133,
+      "registry": "https://clawhub.ai"
+    },
+    "find-skills1": {
+      "version": "1.0.0",
+      "installedAt": 1780942293968,
+      "registry": "https://clawhub.ai"
+    },
+    "memory-setup": {
+      "version": "1.0.0",
+      "installedAt": 1780942298669,
+      "registry": "https://clawhub.ai"
+    },
+    "self-improving-agent": {
+      "version": "3.0.23",
+      "installedAt": 1780942304660,
+      "registry": "https://clawhub.ai"
+    },
+    "web-content-fetcher": {
+      "version": "1.0.1",
+      "installedAt": 1780942313916,
+      "registry": "https://clawhub.ai"
+    },
+    "nano-pdf": {
+      "version": "1.0.0",
+      "installedAt": 1780942321046,
+      "registry": "https://clawhub.ai"
+    },
+    "humanizer": {
+      "version": "1.0.0",
+      "installedAt": 1780942326082,
+      "registry": "https://clawhub.ai"
+    },
+    "nano-banana-pro": {
+      "version": "1.0.1",
+      "installedAt": 1780942332900,
+      "registry": "https://clawhub.ai"
+    },
+    "proactive-agent": {
+      "version": "3.1.0",
+      "installedAt": 1780942339104,
+      "registry": "https://clawhub.ai"
+    },
+    "yuyonghao-summarize": {
+      "version": "0.1.0",
+      "installedAt": 1780942451210,
+      "registry": "https://clawhub.ai"
+    }
+  }
+}
