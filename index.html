@@ -410,7 +410,6 @@ function initGame(){
   streak = 0;
   maxStreak = 0;
   isPlaying = true;
-  isCnMode = false;
   results = [];
   updateStats();
   modeBtn.textContent = isCnMode ? '中-英' : '英-中';
@@ -509,7 +508,7 @@ function endGame(){
       得分: ${score} &nbsp;|&nbsp; 正确: ${correct}/${total}<br>
       正确率: ${acc}% &nbsp;|&nbsp; 最高连击: ${maxStreak}
     </div>
-    <button id="report-btn" style="margin-top:16px;padding:12px 32px;background:linear-gradient(135deg,#f59e0b,#f97316);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer">生成学案报告</button>
+    <button id="report-btn" style="margin-top:16px;padding:12px 32px;background:linear-gradient(135deg,#f59e0b,#f97316);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer" onclick="generateReport()">生成学案报告</button>
   `;
   answerInput.disabled = true;
   modeBtn.disabled = false;
