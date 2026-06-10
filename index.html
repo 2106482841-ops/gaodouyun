@@ -214,7 +214,7 @@ footer{text-align:center;padding:24px;color:var(--muted);font-size:12px;border-t
   <div class="game-controls">
     <button class="primary" id="start-btn">开始游戏</button>
     <button id="skip-btn" disabled>跳过</button>
-    <button id="mode-btn">中-英</button>
+    <button id="mode-btn">中-英</button> <span id="mode-label" style="font-size:12px;color:var(--muted);margin-left:4px">（看英文写中文）</span>
   </div>
 
 </div>
@@ -362,6 +362,7 @@ const submitBtn = document.getElementById('submit-btn');
 const startBtn = document.getElementById('start-btn');
 const skipBtn = document.getElementById('skip-btn');
 const modeBtn = document.getElementById('mode-btn');
+const modeLabel = document.getElementById('mode-label');
 const gScore = document.getElementById('g-score');
 const gCount = document.getElementById('g-count');
 const gAcc = document.getElementById('g-acc');
@@ -413,7 +414,7 @@ function initGame(){
   results = [];
   updateStats();
   modeBtn.textContent = isCnMode ? '中-英' : '英-中';
-  showWord();
+  modeLabel.textContent = isCnMode ? '（看中文写英文）' : '（看英文写中文）';
   answerInput.disabled = false;
   modeBtn.disabled = true;
   modeBtn.style.opacity = '0.4';
@@ -531,7 +532,7 @@ function toggleMode(){
   if(isPlaying) return;
   isCnMode = !isCnMode;
   modeBtn.textContent = isCnMode ? '中-英' : '英-中';
-  if(isPlaying || currentIndex < gameWords.length) showWord();
+  modeLabel.textContent = isCnMode ? '（看中文写英文）' : '（看英文写中文）';
 }
 
 function renderWordList(){
