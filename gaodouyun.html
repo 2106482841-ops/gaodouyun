@@ -781,10 +781,10 @@ function generateReport(){
       ];
     }
     const advCards = getAdviceCards();
-    const adviceCardsHtml = advCards.map(c => 
+    const adviceCardsList = advCards.map(c => 
       '<div style="background:#f9fafb;border-radius:10px;padding:12px;border:1px solid #f3f4f6;min-width:0"><div style="font-size:18px;margin-bottom:4px">'+c.icon+'</div><div style="font-size:13px;font-weight:600;color:#111827;margin-bottom:3px">'+c.title+'</div><div style="font-size:11px;color:#6b7280;line-height:1.5">'+c.desc+'</div></div>'
-    ).join('') +
-    '<div class="section"><h3>个性化提升建议</h3><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:12px 0">'+adviceCardsHtml+'</div></div>' +
+    ).join('');
+    const adviceCardsSection = '<div class="section"><h3>个性化提升建议</h3><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:12px 0">'+adviceCardsList+'</div></div>' +
     
     // 底部
     '<div class="footer">高斗云 &middot; 右脑图像记忆法<br>扫码添加老师微信，获取完整分析报告及专属学案</div>' +
