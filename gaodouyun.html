@@ -225,6 +225,9 @@ footer{text-align:center;padding:24px;color:var(--muted);font-size:12px;border-t
     <h2>学案历程</h2>
     <p style="color:var(--muted);font-size:14px">查看所有历史学习报告与学案建议</p>
   </div>
+  <!-- 数据总览 -->
+  <div id="report-summary" style="display:none;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px"></div>
+  <!-- 历史列表 -->
   <div id="report-history">
     <div style="text-align:center;padding:40px 0;color:var(--muted);font-size:14px">还没有学习记录</div>
   </div>
@@ -563,12 +566,16 @@ function generateReport(){
     return '需从基础词汇开始积累';
   }
   
-  // 错词HTML
+  // 错词HTML（带难度标签）
   let wrongHtml = '';
   if(wrongResults.length > 0){
-    wrongHtml = wrongResults.map((r,i) => 
-      '<tr><td class="wc">'+(i+1)+'</td><td class="we">'+r.word.en+'</td><td class="wz">'+r.word.cn+'</td><td class="wn">'+r.word.meaning+'</td></tr>'
-    ).join('');
+    const diffLabels = ['','基础词','核心词','高频词','拓展词'];
+    wrongHtml = wrongResults.map((r,i) => {
+      const ci = i%4+1;
+      const diffColor = ci<2?'#22c55e':ci<3?'#f59e0b':'#ef4444';
+      const diffBg = ci<2?'#f0fdf4':ci<3?'#fef3c7':'#fef2f2';
+      return '<tr><td class="wc">'+(i+1)+'</td><td class="we">'+r.word.en+'</td><td class="wz">'+r.word.cn+'</td><td class="wn">'+r.word.meaning+'</td><td><span class="skill-tag" style="background:'+diffBg+';color:'+diffColor+'">'+diffLabels[ci]+'</span></td></tr>';
+    }).join('');
   }
   
   // 正确HTML
@@ -678,6 +685,12 @@ function generateReport(){
     '.print-btn.sec{background:#6b7280}' +
     '@media(max-width:600px){.overview{grid-template-columns:repeat(2,1fr)}.plan-grid{grid-template-columns:1fr}.header{flex-direction:column;text-align:center}.header-right{margin-top:8px}.memory-timeline{flex-direction:column}}' +
     '.tag-diff{display:inline-block;background:#e0e7ff;color:#4338ca;padding:2px 10px;border-radius:10px;font-size:11px;font-weight:600}' +
+    '.progress-bar{background:#f3f4f6;border-radius:99px;height:10px;overflow:hidden;margin:8px 0}' +
+    '.progress-fill{height:100%;border-radius:99px;transition:width .6s ease}' +
+    '.dist-chart{display:flex;gap:4px;margin:12px 0;height:36px}' +
+    '.dist-seg{display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#fff;border-radius:6px;min-width:20px}' +
+    '.skill-tag{display:inline-block;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:500;margin:2px 3px}' +
+    '.detail-bar{display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:4px 0}' +
     '</style></head><body><div class="report">' +
     
     // 头部
@@ -692,9 +705,23 @@ function generateReport(){
     '<div class="ov-item"><div class="ol">预估速度</div><div class="ov">'+estimatedSpeed+'</div><div class="od">反应速度评分</div></div>' +
     '<div class="ov-item"><div class="ol">最高连击</div><div class="ov">'+maxStreak+'x</div><div class="od">'+(maxStreak>=5?'手速不错':maxStreak>=3?'状态稳定':'继续加油')+'</div></div></div>' +
     
+    // 掌握进度条
+    '<div class="progress-bar" style="margin:16px 0 6px"><div class="progress-fill" style="width:'+rate+'%;background:'+(rate>=60?'#22c55e':'#f59e0b')+'"></div></div>' +
+    '<div class="detail-bar"><span>正确 '+correct+'/'+total+'</span><span>错词 '+wrongResults.length+'个</span><span style="font-weight:600;color:'+gradeColor+'">'+rate+'%</span></div>' +
+    
+    // 掌握分布图
+    (function(){
+      const allCount = total;
+      const correctShare = Math.round(correct / allCount * 100);
+      const wrongShare = 100 - correctShare;
+      return '<div style="margin:14px 0 18px"><div style="font-size:12px;font-weight:600;color:#374151;margin-bottom:6px">掌握分布</div><div class="dist-chart">' +
+        (correctShare > 0 ? '<div class="dist-seg" style="flex:'+correctShare+';background:#22c55e">'+correctShare+'%</div>' : '') +
+        (wrongShare > 0 ? '<div class="dist-seg" style="flex:'+wrongShare+';background:#ef4444">'+wrongShare+'%</div>' : '') +
+        '</div><div style="display:flex;gap:16px;font-size:11px;color:#6b7280"><span style="color:#22c55e">已掌握</span><span style="color:#ef4444">待加强</span></div></div>';
+    })() +
+    
     // 考试对标
-    '<div class="exam-benchmark"><strong>考试对标:</strong> '+getExamBenchmark(estimatedSpeed)+'<br>' +
-    '<strong>本轮词汇:</strong> '+gameWords.length+'个 &nbsp;|&nbsp; <strong>错词:</strong> '+wrongResults.length+'个 &nbsp;|&nbsp; <strong>用时:</strong> 实时测评</div>' +
+    '<div class="exam-benchmark"><strong>考试对标:</strong> '+getExamBenchmark(estimatedSpeed)+'</div>' +
     
     // 正确词汇
     '<div class="section"><h3>已掌握词汇 ('+correctResults.length+'个)</h3>' +
@@ -703,7 +730,7 @@ function generateReport(){
     // 错词回顾
     '<div class="section"><h3>错词回顾 ('+wrongResults.length+'个)</h3>' +
     (wrongResults.length > 0 ?
-    '<div class="table-wrap"><table class="wrong-table"><tr><th></th><th>英文</th><th>中文释义</th><th>详细含义</th></tr>'+wrongHtml+'</table></div>' :
+    '<div class="table-wrap"><table class="wrong-table"><tr><th></th><th>英文</th><th>中文释义</th><th>详细含义</th><th>难度</th></tr>'+wrongHtml+'</table></div>' :
     '<p style="color:#16a34a;font-size:14px;padding:12px 0;text-align:center">全部答对，没有错词</p>') + '</div>' +
     
     // 学习规划
@@ -717,14 +744,44 @@ function generateReport(){
     ).join('') +
     '</div></div>' +
     
-    // 个性化提升建议
-    '<div class="tips-box"><h4>个性化提升建议</h4><ul>' +
-    (rate < 40 ? '<li>词汇基础薄弱，建议从核心高频词汇开始，每天15个新词+复习旧词</li><li>使用右脑图像记忆法，把单词与生动画面联系起来，记起来更轻松</li><li>先使用"英译中"模式建立理解，再用"中译英"练习输出</li><li>建议家长或老师协助制定每日学习计划，养成固定学习节奏</li>' :
-     rate < 60 ? '<li>有一定基础但不够扎实，重点攻克本次错词，它们是提升的关键</li><li>每天坚持20分钟单词训练，保持语感不断进步</li><li>尝试将新单词用在日常句子中，加深理解和记忆</li><li>建议每周做一次测试，检验学习效果，逐步提高正确率</li>' :
-     rate < 75 ? '<li>掌握情况良好，建议将错词整理到专属错题本，定期回顾</li><li>尝试"中译英"模式来锻炼输出能力，不仅看得懂还要拼得出</li><li>适当增加每日训练量，向更高正确率冲刺</li><li>可开始结合简单段落阅读，在具体语境中巩固词汇</li>' :
-     rate < 90 ? '<li>表现优秀，错词不多但需要重视，建议标记后隔天再次测试</li><li>挑战困难模式，在限时压力下训练反应速度</li><li>适当扩大词汇范围，预习更高年级的词汇</li><li>坚持每天训练，稳步朝着满分神手的目标前进</li>' :
-     '<li>本轮词汇已全部掌握，表现非常出色</li><li>建议扩大词汇范围，开始接触更高级别的词汇</li><li>可挑战更高难度的综合训练模式</li><li>保持每天练习的习惯，综合能力将稳步提升</li>') +
-    '</ul></div>' +
+    // 个性化提升建议（卡片化）
+    function getAdviceCards(){
+      if(rate < 40) return [
+        {icon:'📚',title:'基础夯实',desc:'从核心高频词汇开始，每天15个新词+复习旧词'},
+        {icon:'🧠',title:'图像记忆',desc:'使用右脑图像记忆法，把单词与画面联系起来'},
+        {icon:'🎯',title:'循序渐进',desc:'先英译中建立理解，再中译英练习输出'},
+        {icon:'📅',title:'每日规划',desc:'建议家长协助制定学习计划，养成固定节奏'}
+      ];
+      if(rate < 60) return [
+        {icon:'🎯',title:'错词攻克',desc:'重点攻克本次错词，它们是提升的关键'},
+        {icon:'⏰',title:'每日坚持',desc:'每天20分钟单词训练，保持语感进步'},
+        {icon:'✍️',title:'活学活用',desc:'尝试将新单词用在日常句中加深记忆'},
+        {icon:'📊',title:'周测检验',desc:'每周做一次测试，检验学习效果'}
+      ];
+      if(rate < 75) return [
+        {icon:'📝',title:'错题本',desc:'将错词整理到专属错题本，定期回顾'},
+        {icon:'🔄',title:'输出训练',desc:'中译英模式锻炼输出能力'},
+        {icon:'📈',title:'增加训练',desc:'适当增加每日训练量，向更高正确率冲刺'},
+        {icon:'📖',title:'阅读巩固',desc:'结合简单段落阅读，在语境中巩固词汇'}
+      ];
+      if(rate < 90) return [
+        {icon:'⭐',title:'错词清零',desc:'错词标记后隔天再次测试直到全部掌握'},
+        {icon:'⚡',title:'限时挑战',desc:'挑战困难模式，训练反应速度'},
+        {icon:'📚',title:'拓展词汇',desc:'扩大词汇范围，预习更高年级内容'},
+        {icon:'🏆',title:'持续进步',desc:'坚持每天训练，朝满分神手目标前进'}
+      ];
+      return [
+        {icon:'🎉',title:'全部掌握',desc:'本轮词汇已全部掌握，表现非常出色'},
+        {icon:'🚀',title:'拓展提升',desc:'开始接触更高级别词汇，挑战更高难度'},
+        {icon:'🏅',title:'综合训练',desc:'挑战综合训练模式，全面提升能力'},
+        {icon:'📅',title:'持之以恒',desc:'保持每天练习，综合能力将稳步提升'}
+      ];
+    }
+    const advCards = getAdviceCards();
+    const adviceCardsHtml = advCards.map(c => 
+      '<div style="background:#f9fafb;border-radius:10px;padding:12px;border:1px solid #f3f4f6;min-width:0"><div style="font-size:18px;margin-bottom:4px">'+c.icon+'</div><div style="font-size:13px;font-weight:600;color:#111827;margin-bottom:3px">'+c.title+'</div><div style="font-size:11px;color:#6b7280;line-height:1.5">'+c.desc+'</div></div>'
+    ).join('');
+    '<div class="section"><h3>个性化提升建议</h3><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:12px 0">'+adviceCardsHtml+'</div></div>' +
     
     // 底部
     '<div class="footer">高斗云 &middot; 右脑图像记忆法<br>扫码添加老师微信，获取完整分析报告及专属学案</div>' +
@@ -759,18 +816,46 @@ function loadReportHistory(){
 
 function renderReportHistory(){
   const container = document.getElementById('report-history');
+  const summary = document.getElementById('report-summary');
   const history = loadReportHistory();
   if(history.length === 0){
     container.innerHTML = '<div style="text-align:center;padding:40px 0;color:var(--muted);font-size:14px">还没有学习记录，完成一轮单词速打后会自动生成</div>';
+    if(summary) summary.style.display = 'none';
     return;
   }
+  
+  // 总览数据
+  const totalSessions = history.length;
+  const avgRate = Math.round(history.reduce((s,r)=>s+r.rate,0) / totalSessions);
+  const totalCorrect = history.reduce((s,r)=>s+r.correct,0);
+  const maxScore = Math.max(...history.map(r=>r.score));
+  const bestRate = Math.max(...history.map(r=>r.rate));
+  
+  if(summary){
+    summary.style.display = 'grid';
+    const sumItems = [
+      {label:'学习次数',val:totalSessions+'次',bg:'#fef3c7',c:'#92400e'},
+      {label:'平均正确率',val:avgRate+'%',bg:'#f0fdf4',c:'#166534'},
+      {label:'累计掌握',val:totalCorrect+'词',bg:'#eff6ff',c:'#1e40af'},
+      {label:'最佳纪录',val:bestRate+'%/'+maxScore+'分',bg:'#faf5ff',c:'#7e22ce'}
+    ];
+    summary.innerHTML = sumItems.map(s => 
+      '<div style="background:var(--card);border-radius:12px;padding:14px;text-align:center;border:1px solid rgba(255,255,255,.06)">' +
+      '<div style="font-size:11px;color:var(--muted);margin-bottom:6px">'+s.label+'</div>' +
+      '<div style="font-size:22px;font-weight:800;color:'+s.c+'">'+s.val+'</div></div>'
+    ).join('');
+  }
+  
+  // 历史记录（带进度条）
   container.innerHTML = history.map((r,i) => {
     const color = r.rate >= 90 ? '#16a34a' : r.rate >= 75 ? '#2563eb' : r.rate >= 60 ? '#f59e0b' : r.rate >= 40 ? '#9333ea' : '#dc2626';
-    const bg = r.rate >= 90 ? '#f0fdf4' : r.rate >= 75 ? '#eff6ff' : r.rate >= 60 ? '#fef3c7' : r.rate >= 40 ? '#faf5ff' : '#fef2f2';
-    return '<div style="background:var(--card);border-radius:12px;padding:14px 16px;margin-bottom:10px;border:1px solid rgba(255,255,255,.06);display:flex;align-items:center;gap:12px">' +
+    const bg = r.rate >= 90 ? '#052e16' : r.rate >= 75 ? '#172554' : r.rate >= 60 ? '#451a03' : r.rate >= 40 ? '#3b0764' : '#450a0a';
+    return '<div style="background:var(--card);border-radius:12px;padding:14px 16px;margin-bottom:10px;border:1px solid rgba(255,255,255,.06)">' +
+      '<div style="display:flex;align-items:center;gap:12px">' +
       '<div style="width:40px;height:40px;border-radius:50%;background:'+bg+';color:'+color+';display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;flex-shrink:0">'+r.grade+'</div>' +
-      '<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;color:var(--text)">'+r.dateStr+'</div>' +
-      '<div style="font-size:12px;color:var(--muted);margin-top:2px">得分 '+r.score+' &middot; 正确率 '+r.rate+'% &middot; 错词 '+r.wrongCount+'个 &middot; 最高连击 '+r.maxStreak+'x</div></div></div>';
+      '<div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600;color:var(--text)">'+r.dateStr+'</div>' +
+      '<div style="font-size:11px;color:var(--muted);margin-top:2px">得分 '+r.score+' &middot; 正确率 '+r.rate+'% &middot; 错词 '+(r.wrongCount||0)+'个</div>' +
+      '<div style="background:rgba(255,255,255,.08);border-radius:99px;height:4px;margin-top:6px;overflow:hidden"><div style="width:'+r.rate+'%;height:100%;background:'+color+';border-radius:99px"></div></div></div></div></div>';
   }).join('');
 }
 
