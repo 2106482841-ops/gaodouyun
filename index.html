@@ -410,8 +410,10 @@ function initGame(){
   streak = 0;
   maxStreak = 0;
   isPlaying = true;
+  isCnMode = false;
   results = [];
   updateStats();
+  modeBtn.textContent = '中-英';
   showWord();
   answerInput.disabled = false;
   modeBtn.disabled = true;
