@@ -516,7 +516,6 @@ function endGame(){
   submitBtn.disabled = true;
   skipBtn.disabled = true;
   startBtn.textContent = '再来一次';
-  document.getElementById('report-btn').addEventListener('click',generateReport);
 }
 
 function updateStats(){
@@ -988,6 +987,13 @@ document.addEventListener('click', function initAudio(){
   } catch(e){}
   document.removeEventListener('click', initAudio);
 }, {once: true});
+
+// 委托事件：生成学案报告按钮（处理动态创建的按钮）
+document.addEventListener('click', function(e){
+  if(e.target && e.target.id === 'report-btn'){
+    generateReport();
+  }
+});
 </script>
 </body>
 </html>
